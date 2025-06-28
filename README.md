@@ -16,7 +16,7 @@ Ein interaktives Tool zum Probieren und Verstehen einfacher Anweisungen für ein
 
 > Wird unterstützt durch **GitHub Pages**.
 
-👉 [Hier klicken, um das Projekt direkt im Browser zu starten](https://tonitaste.github.io/Robby/)
+👉 [Hier klicken, um das Projekt direkt im Browser zu starten](https://tonitaste.github.io/Robby/index.html)
 
 ## 📦 Installation (lokal)
 
