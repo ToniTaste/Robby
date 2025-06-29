@@ -1,4 +1,4 @@
-# ✏️ Robby-Blockly
+# 🤖 Robby-Blockly
 
 Ein interaktives Tool zum Probieren und Verstehen einfacher Anweisungen für einen Roboter – inspiriert von Turtle Graphics. 
 
