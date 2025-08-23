@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +7,6 @@
   <link rel="stylesheet" href="styles.css">
   <script src="./scripts/blockly.min.js" defer></script>
 </head>
-
 <body>
   <div id="code-panel">
     <h2>Anweisungen</h2>
@@ -23,21 +21,31 @@
     <div id="blocklyDiv"></div>
     <button id="btnUndo">Letzte Anweisung zurücknehmen</button>
   </div>
+
   <div id="canvas-panel">
     <div id="canvas-container">
       <canvas id="gameCanvas"></canvas>
       <div id="status-overlay"></div>
     </div>
   </div>
+
   <div id="side-panel">
     <h2>Labyrinthauswahl</h2>
-    <select id="selectMaze"></select>
+    <select id="selectMaze"></select><br/>
+
+    <!-- NEU: Labyrinth-Import -->
+    <div class="data-group" style="margin-top:.5rem">
+      <button id="btnImportMaze">Labyrinth importieren</button>
+      <input type="file" id="fileInputMaze" accept="application/json,.json" style="display:none;" />
+    </div>
+
     <h2>Datenverwaltung</h2>
     <div class="data-group">
       <button id="btnSave">Programm speichern</button>
       <button id="btnLoadSequence">Programm laden</button>
     </div>
     <input type="file" id="fileInputSequence" accept="application/json" style="display:none;" />
+
     <xml id="toolbox" xmlns="https://developers.google.com/blockly/xml">
       <block type="move_forward"></block>
       <block type="turn_right"></block>
@@ -47,8 +55,7 @@
       <block type="swim"></block>
     </xml>
   </div>
+
   <script src="./scripts/main.js"></script>
 </body>
-
-
 </html>
