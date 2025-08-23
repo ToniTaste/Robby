@@ -1,0 +1,120 @@
+body {
+      display: flex;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+    }
+
+    #code-panel {
+      width: 30%;
+      padding: 10px;
+      background: #f5f5f5;
+      border-right: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cmd-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .cmd-group button {
+      padding: 5px;
+      font-size: 1rem;
+      background-color: #e0f7fa;
+      border: 1px solid #26c6da;
+    }
+
+    #blocklyDiv {
+      flex: 1;
+      min-height: 300px;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+
+    #btnUndo {
+      padding: 8px;
+      margin-bottom: 16px;
+    }
+
+    #btnJump,
+    #btnClimb,
+    #btnSwim {
+      display: none;
+    }
+
+    #canvas-panel {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    #canvas-container {
+      border: 20px solid #999;
+      display: inline-block;
+      position: relative;
+    }
+
+    #gameCanvas {
+      display: block;
+    }
+
+    #status-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 1.5rem;
+      display: none;
+      pointer-events: none;
+    }
+
+    #side-panel {
+      width: 20%;
+      padding: 10px;
+      background: #f5f5f5;
+      border-left: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .data-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .data-group button {
+      padding: 8px;
+      font-size: 1rem;
+    }
+
+    xml#toolbox {
+      display: none;
+    }
+
+    .blocklyBlock {
+      border-radius: 10px;
+      /* Abgerundete Ecken */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      /* Schatten */
+    }
+
+    .blocklyText {
+      font-family: 'Arial', sans-serif;
+      /* Schriftart */
+      font-size: 16px;
+      /* Schriftgröße */
+      fill: #fff;
+      /* Textfarbe */
+    }
