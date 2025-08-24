@@ -76,7 +76,7 @@ window.addEventListener('load', () => {
       { type: 'climb', message0: 'klettere ein Feld weiter', previousStatement: null, nextStatement: null, colour: 65 },
       { type: 'swim', message0: 'schwimme ein Feld weiter', previousStatement: null, nextStatement: null, colour: 180 }
     ]);
-    const workspace = Blockly.inject('blocklyDiv', { toolbox, readOnly: true, scrollbars: true, renderer: 'zelos', startScale: 0.8, theme: Blockly.Themes.Classic });
+    const workspace = Blockly.inject('blocklyDiv', { toolbox, readOnly: true, scrollbars: true, renderer: 'zelos', theme: Blockly.Themes.Classic });
     const manager = new BlockManager(workspace);
 
     //Zeichenfläche
@@ -405,4 +405,5 @@ window.addEventListener('load', () => {
     loadMaze(0);
   }
 });
+
 
