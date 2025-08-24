@@ -305,7 +305,7 @@ window.addEventListener('load', () => {
     document.getElementById('btnLoadSequence').onclick = () => { fileInputSeq.value = ''; fileInputSeq.click(); };
     fileInputSeq.onchange = e => {
       if (!e.target.files[0]) { showOverlay('Keine Datei ausgewählt!'); return; }
-      loadMaze(parseInt(select.value, 10));
+      //loadMaze(parseInt(select.value, 10));
       const reader = new FileReader();
       reader.onload = evt => {
         try {
@@ -405,5 +405,6 @@ window.addEventListener('load', () => {
     loadMaze(0);
   }
 });
+
 
 
