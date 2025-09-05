@@ -6,7 +6,7 @@ Ein interaktives Tool zum Probieren und Verstehen einfacher Anweisungen für ein
 
 - Interaktives Probieren der Blöcke und ihrer Wirkung
 - Auswahl verschiedener Hindernisstouren mit steigender Schwierigkeit und Blockzahl
-- Weitere Labyrinth ladbar - Entwickle eigene Labyrinthe mit dem [Robby-Editor](https://github.ToniTaste/Robby-Edit)
+- Weitere Labyrinth ladbar - Entwickle eigene Labyrinthe mit dem [Robby-Editor](https://github.com/ToniTaste/Robby-Edit))
 - Speichern/Laden des Programmcodes als JSON
 
 ## 🖼️ Screenshot
