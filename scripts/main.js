@@ -214,7 +214,7 @@ window.addEventListener('load', () => {
         [0, 3, 1, 0, 4],
         [0, 0, 2, 0, 4]
       ],
-      player: { x: 2, y: 2, dir: 1 },
+      player: { x: 0, y: 2, dir: 1 },
       goal: { x: 3, y: 2 },
       variante: 1
     },
@@ -459,3 +459,4 @@ window.addEventListener('load', () => {
     loadMaze(0);
   }
 });
+
