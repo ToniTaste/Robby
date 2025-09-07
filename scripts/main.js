@@ -84,7 +84,7 @@ window.addEventListener('load', () => {
     const ctx = canvas.getContext('2d');
     const [imgTree, imgRock, imgHole, imgTunnel, imgTreasure, imgRobot] = imgs;
 
-    let labyrinth, start, goal, state, cols, rows, cellSize;
+    let labyrinth, player, goal, state, cols, rows, cellSize;
 
     //Labyrinthe (Beispiele)
     const mazes = [{
@@ -96,7 +96,7 @@ window.addEventListener('load', () => {
         [0, 0, 1, 0, 0],
         [0, 0, 0, 1, 0]
       ],
-      start: { x: 0, y: 0, dir: 2 },
+      player: { x: 0, y: 0, dir: 2 },
       goal: { x: 4, y: 4 },
       variante: 0
     },
@@ -109,7 +109,7 @@ window.addEventListener('load', () => {
         [0, 0, 1, 0, 0],
         [0, 0, 0, 1, 0]
       ],
-      start: { x: 4, y: 0, dir: 2 },
+      player: { x: 4, y: 0, dir: 2 },
       goal: { x: 0, y: 0 },
       variante: 0
     },
@@ -126,7 +126,7 @@ window.addEventListener('load', () => {
         [1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
         [1, 0, 1, 1, 1, 0, 1, 1, 1, 0],
         [1, 0, 0, 0, 1, 0, 0, 0, 0, 0]],
-      start: { x: 0, y: 0, dir: 1 },
+      player: { x: 0, y: 0, dir: 1 },
       goal: { x: 7, y: 3 },
       variante: 0
     },
@@ -140,7 +140,7 @@ window.addEventListener('load', () => {
         [1, 1, 1, 1, 3, 1],
         [0, 0, 0, 0, 0, 1]
       ],
-      start: { x: 0, y: 5, dir: 1 },
+      player: { x: 0, y: 5, dir: 1 },
       goal: { x: 5, y: 0 },
       variante: 1
     },
@@ -156,7 +156,7 @@ window.addEventListener('load', () => {
         [4, 4, 4, 4, 4, 4, 1, 1],
         [4, 3, 3, 1, 4, 1, 4, 4]
       ],
-      start: { x: 7, y: 4, dir: 2 },
+      player: { x: 7, y: 4, dir: 2 },
       goal: { x: 0, y: 3 },
       variante: 1
     },
@@ -173,8 +173,62 @@ window.addEventListener('load', () => {
         [4, 3, 3, 1, 4, 0, 0, 4, 4],
         [4, 4, 4, 4, 4, 1, 0, 1, 4]
       ],
-      start: { x: 0, y: 0, dir: 2 },
+      player: { x: 0, y: 0, dir: 2 },
       goal: { x: 6, y: 8 },
+      variante: 1
+    },
+    {
+      name: 'Ü1',
+      grid: [
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 0, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1]
+      ],
+      player: { x: 3, y: 4, dir: 3 },
+      goal: { x: 4, y: 2 },
+      variante: 0
+    },
+    {
+      name: 'Ü2',
+      grid: [
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1, 1],
+        [1, 0, 1, 1, 1, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1]
+      ],
+      player: { x: 1, y: 4, dir: 4 },
+      goal: { x: 4, y: 4 },
+      variante: 0
+    },
+    {
+      name: 'Ü3',
+      grid: [
+        [4, 4, 1, 1, 4],
+        [1, 2, 4, 4, 4],
+        [0, 1, 2, 0, 1],
+        [0, 3, 1, 0, 4],
+        [0, 0, 2, 0, 4]
+      ],
+      player: { x: 2, y: 2, dir: 1 },
+      goal: { x: 3, y: 2 },
+      variante: 1
+    },
+    {
+      name: 'Ü4',
+      grid: [
+        [1, 1, 1, 4, 0],
+        [1, 3, 3, 4, 4],
+        [3, 3, 1, 4, 4],
+        [3, 0, 2, 0, 4],
+        [0, 3, 1, 1, 1]
+      ],
+      player: { x: 4, y: 0, dir: 2 },
+      goal: { x: 0, y: 4 },
       variante: 1
     }
     ];
@@ -192,9 +246,9 @@ window.addEventListener('load', () => {
 
       const m = mazes[idx];
       labyrinth = m.grid;
-      start = { ...m.start };
+      player = { ...m.player };
       goal = { ...m.goal };
-      state = { ...start };
+      state = { ...player };
       // Show/hide advanced command buttons based on variante
       const showAdvanced = m.variante === 1;
       document.getElementById('btnJump').style.display = showAdvanced ? 'block' : 'none';
@@ -202,7 +256,7 @@ window.addEventListener('load', () => {
       document.getElementById('btnSwim').style.display = showAdvanced ? 'block' : 'none';
       rows = labyrinth.length;
       cols = labyrinth[0].length;
-      cellSize = 600 / Math.max(cols, rows);
+      cellSize = 500 / Math.max(cols, rows);
 
       canvas.width = cols * cellSize;
       canvas.height = rows * cellSize;
@@ -264,7 +318,7 @@ window.addEventListener('load', () => {
     document.getElementById('btnJump').onclick = () => add('jump');
     document.getElementById('btnClimb').onclick = () => add('climb');
     document.getElementById('btnSwim').onclick = () => add('swim');
-    document.getElementById('btnUndo').onclick = () => { manager.undo(); state = { ...start }; manager.forEach(b => apply(b.type)); draw(); };
+    document.getElementById('btnUndo').onclick = () => { manager.undo(); state = { ...player }; manager.forEach(b => apply(b.type)); draw(); };
 
     // Programm speichern
     document.getElementById('btnSave').onclick = async () => {
@@ -313,7 +367,7 @@ window.addEventListener('load', () => {
           if (!Array.isArray(seq) || !seq.every(c => ['move_forward', 'turn_right', 'turn_left', 'jump', 'climb', 'swim'].includes(c))) {
             showOverlay('Ungültige Anweisungsfolge!'); return;
           }
-          manager.clear(); state = { ...start };
+          manager.clear(); state = { ...player };
           for (let i = 0; i < seq.length; i++) {
             const cmd = seq[i];
             if (!apply(cmd)) break;
@@ -353,9 +407,9 @@ window.addEventListener('load', () => {
             }
           }
 
-          // start/goal prüfen oder defaults
-          const s = data.start || { x: 0, y: 0, dir: 2 };
-          const t = data.goal  || { x: c - 1, y: r - 1 };
+          // player/goal prüfen oder defaults
+          const s = data.player || { x: 0, y: 0, dir: 2 };
+          const t = data.goal || { x: c - 1, y: r - 1 };
           s.x = clamp(~~s.x, 0, c - 1); s.y = clamp(~~s.y, 0, r - 1); s.dir = clamp(~~s.dir, 0, 3);
           t.x = clamp(~~t.x, 0, c - 1); t.y = clamp(~~t.y, 0, r - 1);
 
@@ -364,12 +418,12 @@ window.addEventListener('load', () => {
 
           // Zustand setzen
           labyrinth = g;
-          start = { x: s.x, y: s.y, dir: s.dir };
-          goal  = { x: t.x, y: t.y };
-          state = { ...start };
+          player = { x: s.x, y: s.y, dir: s.dir };
+          goal = { x: t.x, y: t.y };
+          state = { ...player };
 
           rows = r; cols = c;
-          cellSize = 600 / Math.max(cols, rows);
+          cellSize = 500 / Math.max(cols, rows);
           canvas.width = cols * cellSize;
           canvas.height = rows * cellSize;
 
@@ -401,10 +455,7 @@ window.addEventListener('load', () => {
       reader.readAsText(file);
     };
 
-    //Start mit Labyrinth(0)
+    //player mit Labyrinth(0)
     loadMaze(0);
   }
 });
-
-
-
