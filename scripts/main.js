@@ -201,7 +201,7 @@ window.addEventListener('load', () => {
         [1, 0, 0, 1, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1]
       ],
-      player: { x: 1, y: 4, dir: 4 },
+      player: { x: 1, y: 4, dir: 0 },
       goal: { x: 4, y: 4 },
       variante: 0
     },
