@@ -53,8 +53,36 @@ window.addEventListener('load', () => {
 
   // kleine Helfer
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-  const isMatrix = (g) => Array.isArray(g) && g.length > 0 && g.every(r => Array.isArray(r) && r.length === g[0].length);
-  const computeVariante = (g) => {
+
+  function clampInt(value, min, max, fallback) {
+    const n = parseInt(value, 10);
+    if (!Number.isFinite(n)) return fallback;
+    return clamp(n, min, max);
+  }
+
+  function deepCopyGrid(g) {
+    return g.map(row => [...row]);
+  }
+
+  function isMatrix(g) {
+    return (
+      Array.isArray(g) &&
+      g.length > 0 &&
+      Array.isArray(g[0]) &&
+      g[0].length > 0 &&
+      g.every(r => Array.isArray(r) && r.length === g[0].length)
+    );
+  }
+
+  function isValidCellValue(value) {
+    return Number.isInteger(value) && value >= 0 && value <= 4;
+  }
+
+  function sanitizeGrid(g) {
+    return g.map(row => row.map(value => isValidCellValue(value) ? value : 0));
+  }
+
+  function computeVariante(g) {
     // 1=Stein, 2=Loch, 3=Baum, 4=Wasser
     for (let y = 0; y < g.length; y++) {
       for (let x = 0; x < g[0].length; x++) {
@@ -62,7 +90,50 @@ window.addEventListener('load', () => {
       }
     }
     return 0;
-  };
+  }
+
+  function normalizeMazeData(data) {
+    if (
+      !data ||
+      !isMatrix(data.grid) ||
+      typeof data.player?.x !== 'number' ||
+      typeof data.player?.y !== 'number' ||
+      typeof data.player?.dir !== 'number' ||
+      typeof data.goal?.x !== 'number' ||
+      typeof data.goal?.y !== 'number'
+    ) {
+      throw new Error('Fehlerhaftes Labyrinth-Format.');
+    }
+
+    const importedRows = data.grid.length;
+    const importedCols = data.grid[0].length;
+    const normalizedGrid = sanitizeGrid(data.grid);
+
+    const normalizedPlayer = {
+      x: clampInt(data.player.x, 0, importedCols - 1, 0),
+      y: clampInt(data.player.y, 0, importedRows - 1, 0),
+      dir: clampInt(data.player.dir, 0, 3, 2)
+    };
+
+    const normalizedGoal = {
+      x: clampInt(data.goal.x, 0, importedCols - 1, importedCols - 1),
+      y: clampInt(data.goal.y, 0, importedRows - 1, importedRows - 1)
+    };
+
+    // Start und Ziel dürfen nicht auf Hindernissen liegen.
+    normalizedGrid[normalizedPlayer.y][normalizedPlayer.x] = 0;
+    normalizedGrid[normalizedGoal.y][normalizedGoal.x] = 0;
+
+    return {
+      name: data.name || 'importiertes Labyrinth',
+      grid: normalizedGrid,
+      player: normalizedPlayer,
+      goal: normalizedGoal,
+      variante: Number.isInteger(data.variante)
+        ? clampInt(data.variante, 0, 1, computeVariante(normalizedGrid))
+        : computeVariante(normalizedGrid)
+    };
+  }
 
   //Initialisierung
   function init() {
@@ -78,6 +149,21 @@ window.addEventListener('load', () => {
     ]);
     const workspace = Blockly.inject('blocklyDiv', { toolbox, readOnly: true, scrollbars: true, renderer: 'zelos', theme: Blockly.Themes.Classic });
     const manager = new BlockManager(workspace);
+
+    const allowedCommandTypes = new Set([
+      'move_forward',
+      'turn_right',
+      'turn_left',
+      'jump',
+      'climb',
+      'swim'
+    ]);
+
+    const advancedCommandTypes = new Set([
+      'jump',
+      'climb',
+      'swim'
+    ]);
 
     //Zeichenfläche
     const canvas = document.getElementById('gameCanvas');
@@ -237,6 +323,18 @@ window.addEventListener('load', () => {
     mazes.forEach((m, i) => { const o = document.createElement('option'); o.value = i; o.textContent = m.name; select.append(o); });
     select.onchange = () => loadMaze(parseInt(select.value, 10));
 
+    function sequenceFitsCurrentMaze(seq) {
+      if (!Array.isArray(seq)) return false;
+      if (!seq.every(cmd => allowedCommandTypes.has(cmd))) return false;
+
+      const currentMaze = mazes[parseInt(select.value, 10)];
+      if (currentMaze && currentMaze.variante === 0 && seq.some(cmd => advancedCommandTypes.has(cmd))) {
+        return false;
+      }
+
+      return true;
+    }
+
     //Labyrinth bestimmen und Blöcke ein-/ausblenden
     function loadMaze(idx) {
       // Reset everything
@@ -245,8 +343,14 @@ window.addEventListener('load', () => {
       overlay.style.display = 'none';
 
       const m = mazes[idx];
-      labyrinth = m.grid;
+      if (!m) {
+        showOverlay('Labyrinth nicht gefunden!');
+        return;
+      }
+
+      labyrinth = deepCopyGrid(m.grid);
       player = { ...m.player };
+      player.dir = clampInt(player.dir, 0, 3, 2);
       goal = { ...m.goal };
       state = { ...player };
       // Show/hide advanced command buttons based on variante
@@ -359,21 +463,25 @@ window.addEventListener('load', () => {
     document.getElementById('btnLoadSequence').onclick = () => { fileInputSeq.value = ''; fileInputSeq.click(); };
     fileInputSeq.onchange = e => {
       if (!e.target.files[0]) { showOverlay('Keine Datei ausgewählt!'); return; }
-      //loadMaze(parseInt(select.value, 10));
       const reader = new FileReader();
       reader.onload = evt => {
         try {
-          const seq = JSON.parse(evt.target.result);
-          if (!Array.isArray(seq) || !seq.every(c => ['move_forward', 'turn_right', 'turn_left', 'jump', 'climb', 'swim'].includes(c))) {
-            showOverlay('Ungültige Anweisungsfolge!'); return;
+          const data = JSON.parse(evt.target.result);
+          const seq = Array.isArray(data) ? data : data.sequence;
+          if (!sequenceFitsCurrentMaze(seq)) {
+            showOverlay('Programm passt nicht zu diesem Labyrinth!'); return;
           }
-          manager.clear(); state = { ...player };
+          manager.clear();
+          workspace.clear();
+          state = { ...player };
           for (let i = 0; i < seq.length; i++) {
             const cmd = seq[i];
             if (!apply(cmd)) break;
             manager.add(cmd);
           }
-        } catch { showOverlay('Fehler beim Laden!'); }
+        } catch {
+          showOverlay('Fehler beim Laden!');
+        }
       };
       reader.readAsText(e.target.files[0]);
     };
@@ -392,60 +500,18 @@ window.addEventListener('load', () => {
       reader.onload = evt => {
         try {
           const data = JSON.parse(evt.target.result);
+          const normalized = normalizeMazeData(data);
 
-          // Minimaler Schema-Check
-          if (!data || !isMatrix(data.grid)) throw new Error('grid fehlt oder hat falsches Format');
-          const g = data.grid;
-          const r = g.length, c = g[0].length;
+          mazes.push(normalized);
 
-          // Gültige Zellenwerte 0..4 sicherstellen
-          for (let y = 0; y < r; y++) {
-            if (g[y].length !== c) throw new Error('Unregelmäßige Zeilenlängen');
-            for (let x = 0; x < c; x++) {
-              const v = g[y][x];
-              if (typeof v !== 'number' || v < 0 || v > 4) throw new Error('Ungültiger Zellenwert');
-            }
-          }
+          const option = document.createElement('option');
+          option.value = String(mazes.length - 1);
+          option.textContent = normalized.name;
+          select.append(option);
 
-          // player/goal prüfen oder defaults
-          const s = data.player || { x: 0, y: 0, dir: 2 };
-          const t = data.goal || { x: c - 1, y: r - 1 };
-          s.x = clamp(~~s.x, 0, c - 1); s.y = clamp(~~s.y, 0, r - 1); s.dir = clamp(~~s.dir, 0, 3);
-          t.x = clamp(~~t.x, 0, c - 1); t.y = clamp(~~t.y, 0, r - 1);
+          select.value = option.value;
+          loadMaze(parseInt(option.value, 10));
 
-          // variante ggf. berechnen
-          const vcalc = typeof data.variante === 'number' ? (data.variante ? 1 : 0) : computeVariante(g);
-
-          // Zustand setzen
-          labyrinth = g;
-          player = { x: s.x, y: s.y, dir: s.dir };
-          goal = { x: t.x, y: t.y };
-          state = { ...player };
-
-          rows = r; cols = c;
-          cellSize = 500 / Math.max(cols, rows);
-          canvas.width = cols * cellSize;
-          canvas.height = rows * cellSize;
-
-          // Zusatz-Anweisungen sichtbar je nach variante
-          const adv = vcalc === 1;
-          document.getElementById('btnJump').style.display = adv ? 'block' : 'none';
-          document.getElementById('btnClimb').style.display = adv ? 'block' : 'none';
-          document.getElementById('btnSwim').style.display = adv ? 'block' : 'none';
-
-          // Optional: „Benutzerimport“ in Select setzen/anzeigen
-          let customOpt = Array.from(select.options).find(o => o.value === 'custom');
-          if (!customOpt) {
-            customOpt = document.createElement('option');
-            customOpt.value = 'custom';
-            customOpt.textContent = 'importiertes Labyrinth';
-            select.append(customOpt);
-          }
-          select.value = 'custom';
-
-          manager.clear();
-          workspace.clear();
-          draw();
           showOverlay('Labyrinth importiert');
         } catch (err) {
           console.error(err);
@@ -459,4 +525,3 @@ window.addEventListener('load', () => {
     loadMaze(0);
   }
 });
-
