@@ -92,6 +92,14 @@ window.addEventListener('load', () => {
     return 0;
   }
 
+  function getImportTimeLabel() {
+    const now = new Date();
+    return now.toLocaleTimeString('de-DE', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   function normalizeMazeData(data) {
     if (
       !data ||
@@ -335,6 +343,20 @@ window.addEventListener('load', () => {
       return true;
     }
 
+    function makeImportedMazeName(baseName) {
+      const timeLabel = getImportTimeLabel();
+      const cleanBaseName = baseName || 'importiertes Labyrinth';
+      let name = `${cleanBaseName} (${timeLabel})`;
+      let counter = 2;
+
+      while (mazes.some(m => m.name === name)) {
+        name = `${cleanBaseName} (${timeLabel}, ${counter})`;
+        counter++;
+      }
+
+      return name;
+    }
+
     //Labyrinth bestimmen und Blöcke ein-/ausblenden
     function loadMaze(idx) {
       // Reset everything
@@ -501,6 +523,7 @@ window.addEventListener('load', () => {
         try {
           const data = JSON.parse(evt.target.result);
           const normalized = normalizeMazeData(data);
+          normalized.name = makeImportedMazeName(normalized.name);
 
           mazes.push(normalized);
 
