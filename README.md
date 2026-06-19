@@ -21,12 +21,14 @@ Ein interaktives Tool zum Probieren und Verstehen einfacher Anweisungen für ein
 
 ## 📦 Installation (lokal)
 
-Du kannst das Projekt lokal starten, indem du die Dateien einfach in einen Ordner speicherst und `index.html` in einem Browser öffnest:
+Du kannst das Projekt lokal und ohne Internetzugang betreiben. Lade dazu alles über Code - Download ZIP herunter, entpacke das Archiv in einen Ordner und öffne `index.html` in einem Browser. Alternativ kannst du auch so vorgehen:
 
 ```bash
 git clone https://github.com/ToniTaste/Robby.git
 cd Robby
 # Dann: index.html im Browser öffnen
+```
 
-## Grafiksymbole
+## Quelle der Grafiken
 Vectors and icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a>
+
