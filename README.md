@@ -27,3 +27,6 @@ Du kannst das Projekt lokal starten, indem du die Dateien einfach in einen Ordne
 git clone https://github.com/ToniTaste/Robby.git
 cd Robby
 # Dann: index.html im Browser öffnen
+
+## Grafiksymbole
+Vectors and icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a>
