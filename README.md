@@ -29,6 +29,11 @@ cd Robby
 # Dann: index.html im Browser öffnen
 ```
 
-## Quelle der Grafiken
+## Grafikquellen
 Vectors and icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a>
-
+robot.svg - COLLECTION: Universe 17, LICENSE: CC0 License, UPLOADER: SVG Repo
+rock.svg - COLLECTION: Twemoji Emojis, LICENSE: MIT License, AUTHOR: Twitter
+hole.svg - COLLECTION: Fxemoji Emojis, LICENSE: Apache License, AUTHOR: Mozilla
+treasure.svg - COLLECTION: Lechazo Conf Flat Vectors, LICENSE: CC Attribution License, AUTHOR: lechazoconf
+tree.svg - COLLECTION: Tree Variations Flat Icons, LICENSE: CC0 License, UPLOADER: SVG Repo
+waves.svg - COLLECTION: Symbol, LICENSE: CC0 License, UPLOADER: SVG Repo
